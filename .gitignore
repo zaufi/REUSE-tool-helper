@@ -1,0 +1,13 @@
+#
+# SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-License-Identifier: CC0-1.0
+#
+
+# ATTENTION Add only project-specific ignores here.
+# For your IDE-specific files use your user's ignore list.
+# See also:
+# - https://git-scm.com/docs/gitignore
+# - https://www.pluralsight.com/guides/how-to-use-gitignore-file
+#
+# Use `git check-ignore <path>` for debug.
+#
