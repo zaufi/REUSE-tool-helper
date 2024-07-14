@@ -13,17 +13,20 @@ function try_match_file_and_get_object()
 {
     local -r input_file="$1"
     local -r array_json="$2"
-    local -ir count=$(jq '. | length' <<<${array_json})
+    local -ir count=$(jq '. | length' <<<"${array_json}")
 
     for ((i=0; i<=count-1; i++)) do
-        local candidate_json="$(jq ".[${i}]" <<<${array_json})"
-        local -a patterns=( $(jq .patterns[] <<<${candidate_json}) )
+        local candidate_json="$(jq ".[${i}]" <<<"${array_json}")"
+        # FIXME SC2207
+        # shellcheck disable=SC2207
+        local -a patterns=( $(jq .patterns[] <<<"${candidate_json}") )
         for pattern in "${patterns[@]}"; do
+            # shellcheck disable=SC2053
             if [[ "\"${input_file}\"" == ${pattern} ]]; then
                 if [[ ${VERBOSE} -gt 0 ]]; then
                     echo "Match: ${input_file} -> ${pattern}" >&2
                 fi
-                jq -r 'del(.patterns)' <<<${candidate_json}
+                jq -r 'del(.patterns)' <<<"${candidate_json}"
                 return
             fi
         done
@@ -68,7 +71,7 @@ function get_extra_reuse_cli_option()
                 else \
                     \"\" \
                 end" \
-                <<<${json}
+                <<<"${json}"
             ;;
         str)
             jq -r \
@@ -77,7 +80,7 @@ function get_extra_reuse_cli_option()
                 else \
                     \"\" \
                 end" \
-                <<<${json}
+                <<<"${json}"
             ;;
         *)
             ;;
@@ -89,15 +92,23 @@ function try_get_extra_options()
     local -r json="$1"
     local -n output_opts="$2"
 
+    # FIXME SC2207
+    # shellcheck disable=SC2207
     output_opts+=( $(get_extra_reuse_cli_option merge_copyrights bool "${json}") )
+    # FIXME SC2207
+    # shellcheck disable=SC2207
     output_opts+=( $(get_extra_reuse_cli_option no_replace bool "${json}") )
+    # FIXME SC2207
+    # shellcheck disable=SC2207
     output_opts+=( $(get_extra_reuse_cli_option force_dot_license bool "${json}") )
 
     declare -r prefix="$(get_extra_reuse_cli_option copyright_prefix str "${json}")"
     if [[ -n ${prefix} ]]; then
-        case $(cut -f 2 -d ' ' <<<${prefix}) in
+        case $(cut -f 2 -d ' ' <<<"${prefix}") in
             # TODO Parse `reuse` help and get this list?
             spdx | spdx-c | spdx-symbol | string | string-c | string-symbol | symbol)
+                # FIXME SC2206
+                # shellcheck disable=SC2206
                 output_opts+=( ${prefix} )
                 ;;
             *)
@@ -110,12 +121,14 @@ function try_get_extra_options()
     # TODO Deduplicate this code. It's very similar to `copyright_prefix`!
     declare -r style="$(get_extra_reuse_cli_option style str "${json}")"
     if [[ -n ${style} ]]; then
-        case $(cut -f 2 -d ' ' <<<${style}) in
+        case $(cut -f 2 -d ' ' <<<"${style}") in
             # TODO Parse `reuse` help and get this list?
             applescript | aspx | bat | bibtex | c |cpp | cppsingle | \
             f | ftl | handlebars | haskell | html | jinja | julia | \
             lisp | m4 | ml | f90 | plantuml | python | rst | \
             semicolon | tex | man | vst | vim | xquery)
+                # FIXME SC2206
+                # shellcheck disable=SC2206
                 output_opts+=( ${style} )
                 ;;
             *)
@@ -126,7 +139,11 @@ function try_get_extra_options()
     fi
 
     declare -r template="$(get_extra_reuse_cli_option template str "${json}")"
-    output_opts+=( ${template} )
+    if [[ -n ${template} ]]; then
+        # FIXME SC2206
+        # shellcheck disable=SC2206
+        output_opts+=( ${template} )
+    fi
 
     # TODO Any other options to add?
 }
@@ -141,7 +158,7 @@ while getopts 'c:d' option; do
         hdrmap_file="${OPTARG}"
         ;;
     d)
-        dry_run=echo
+        dry_run='echo'
         ;;
     *)
         exit 1
@@ -161,9 +178,9 @@ if [[ ${#input_files} -eq 0 ]]; then
     exit 1
 fi
 
-declare -r hdrmap_json="$(<${hdrmap_file})"
+declare -r hdrmap_json="$(<"${hdrmap_file}")"
 # NOTE Validate JSON
-if ! jq empty <<<${hdrmap_json} 2>/dev/null; then
+if ! jq empty <<<"${hdrmap_json}" 2>/dev/null; then
     echo "Error: Input file isn't a valid JSON: ${hdrmap_file}" >&2
     exit 1
 fi
@@ -176,7 +193,7 @@ for input_file in "${input_files[@]}"; do
     declare -a extra_opts=()
 
     declare template_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .templates <<<${hdrmap_json})"
+        try_match_file_and_get_object "${input_file}" "$(jq .templates <<<"${hdrmap_json}")"
       )"
     try_get_extra_options "${template_json}" extra_opts
     # Make sure template or style has been given in the `extra_reuse_cli_options`
@@ -186,9 +203,9 @@ for input_file in "${input_files[@]}"; do
     fi
 
     declare license_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .licenses <<<${hdrmap_json})"
+        try_match_file_and_get_object "${input_file}" "$(jq .licenses <<<"${hdrmap_json}")"
       )"
-    declare license=$(jq -r '.ref // empty' <<<${license_json})
+    declare license="$(jq -r '.ref // empty' <<<"${license_json}")"
     if [[ -n ${license} ]]; then
         extra_opts+=('--license' "${license}")
     else
@@ -197,9 +214,9 @@ for input_file in "${input_files[@]}"; do
     fi
 
     declare copyright_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .copyright_headers <<<${hdrmap_json})"
+        try_match_file_and_get_object "${input_file}" "$(jq .copyright_headers <<<"${hdrmap_json}")"
       )"
-    declare copyright=$(jq -r '.text // empty' <<<${copyright_json})
+    declare copyright="$(jq -r '.text // empty' <<<"${copyright_json}")"
     if [[ -z ${copyright} ]]; then
         echo "Error: No copyright match found for ${input_file}. Skip it."
         continue
