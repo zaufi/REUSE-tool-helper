@@ -22,9 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Prepare Python Environment
-        uses: actions/setup-python@v5
-
       - name: Pre-installing requirements
         uses: browniebroke/pre-commit-autoupdate-action@v1.0.0
 
