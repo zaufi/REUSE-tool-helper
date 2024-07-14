@@ -1,0 +1,7 @@
+#
+# SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-License-Identifier: CC0-1.0
+#
+
+# SC2155 (warning): Declare and assign separately to avoid masking return values.
+disable=SC2155
