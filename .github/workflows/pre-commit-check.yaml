@@ -5,11 +5,11 @@ name: Checking `pre-commit` hooks
 on:
   push:
     branches:
-      - main
+      - master
 
   pull_request:
     branches:
-      - main
+      - master
 
   # enable this workflow to be reused
   workflow_call:
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Checking configured hooks
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
