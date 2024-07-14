@@ -9,6 +9,17 @@ set -e
 shopt -s extglob globstar
 
 # BEGIN Helper functions
+function die()
+{
+    echo "$@" >&2
+    exit 1
+}
+
+function warning()
+{
+    echo "$@" >&2
+}
+
 function try_match_file_and_get_object()
 {
     local -r input_file="$1"
@@ -112,8 +123,7 @@ function try_get_extra_options()
                 output_opts+=( ${prefix} )
                 ;;
             *)
-                echo 'Error: Invalid value for copyright_prefix' >&2
-                exit 1
+                die 'Error: Invalid value for copyright_prefix'
                 ;;
         esac
     fi
@@ -132,8 +142,7 @@ function try_get_extra_options()
                 output_opts+=( ${style} )
                 ;;
             *)
-                echo 'Error: Invalid value for style' >&2
-                exit 1
+                die 'Error: Invalid value for style'
                 ;;
         esac
     fi
@@ -168,21 +177,18 @@ done
 shift $((OPTIND - 1))
 
 if [[ ! -f ${hdrmap_file} ]]; then
-    echo "Error: No hdrmap config file found: ${hdrmap_file}" >&2
-    exit 1
+    die "Error: No hdrmap config file found: ${hdrmap_file}"
 fi
 
 declare -a input_files=( "${@}" )
 if [[ ${#input_files} -eq 0 ]]; then
-    echo "Error: No input files given" >&2
-    exit 1
+    die 'Error: No input files given'
 fi
 
 declare -r hdrmap_json="$(<"${hdrmap_file}")"
 # NOTE Validate JSON
 if ! jq empty <<<"${hdrmap_json}" 2>/dev/null; then
-    echo "Error: Input file isn't a valid JSON: ${hdrmap_file}" >&2
-    exit 1
+    die "Error: Input file isn't a valid JSON: ${hdrmap_file}"
 fi
 
 declare git_reuse_name="$(get_any_of_git_options reuse.name user.name)"
@@ -198,7 +204,7 @@ for input_file in "${input_files[@]}"; do
     try_get_extra_options "${template_json}" extra_opts
     # Make sure template or style has been given in the `extra_reuse_cli_options`
     if [[ ${#extra_opts[@]} -eq 0 ]]; then
-        echo "Error: No template or style match found for ${input_file}. Skip it."
+        warning "Error: No template or style match found for ${input_file}. Skip it."
         continue
     fi
 
@@ -209,7 +215,7 @@ for input_file in "${input_files[@]}"; do
     if [[ -n ${license} ]]; then
         extra_opts+=('--license' "${license}")
     else
-        echo "Error: No license match found for ${input_file}. Skip it."
+        warning "Error: No license match found for ${input_file}. Skip it."
         continue
     fi
 
@@ -218,7 +224,7 @@ for input_file in "${input_files[@]}"; do
       )"
     declare copyright="$(jq -r '.text // empty' <<<"${copyright_json}")"
     if [[ -z ${copyright} ]]; then
-        echo "Error: No copyright match found for ${input_file}. Skip it."
+        warning "Error: No copyright match found for ${input_file}. Skip it."
         continue
     fi
     copyright="$(subst_git_config_options reuse.name "${git_reuse_name}" "${copyright}")"
