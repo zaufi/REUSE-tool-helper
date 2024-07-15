@@ -112,6 +112,9 @@ function try_get_extra_options()
     # FIXME SC2207
     # shellcheck disable=SC2207
     output_opts+=( $(get_extra_reuse_cli_option force_dot_license bool "${json}") )
+    # FIXME SC2207
+    # shellcheck disable=SC2207
+    output_opts+=( $(get_extra_reuse_cli_option exclude_year bool "${json}") )
 
     declare -r prefix="$(get_extra_reuse_cli_option copyright_prefix str "${json}")"
     if [[ -n ${prefix} ]]; then

@@ -61,8 +61,8 @@ corresponding CLI option for `reuse annotate`:
 - `copyright_prefix` (string) a choice of predefined strings documented in the `reuse annotate`
   help screen.
 
-- `force_dot_license`, `no_replace`, and `merge_copyrights` (boolean) the `true` value will add
-  the corresponding CLI option.
+- `force_dot_license`, `exclude_year`, `merge_copyrights`, and  `no_replace` (boolean) the `true`
+  value will add the corresponding CLI option.
 
 As noticed above, extra options could be provided for the `templates` object and will affect only
 input file that matches a pattern.
