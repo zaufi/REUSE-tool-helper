@@ -36,8 +36,6 @@ repos:
     hooks:
       - id: gitlint
         name: Commit message check
-        language: python
-        entry: gitlint --msg-filename
         stages: [commit-msg]
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
@@ -51,7 +49,7 @@ repos:
       - id: codespell
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.22.9
+    rev: v1.23.2
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
