@@ -15,6 +15,16 @@ the following top-level keys, each of which is an array of objects: `templates`,
 
 [reuse tool]: https://reuse.software/
 
+```console
+$ add-copyright-header -h
+Usage: add-copyright-header [-d] [FILENAME]...
+
+Add copyright header to files according to the matched patterns in the '.reuse-hdrmap.json'
+
+Options:
+    -d      show command but don't execute it
+```
+
 
 ## Templates object
 

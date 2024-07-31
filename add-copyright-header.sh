@@ -159,18 +159,34 @@ function try_get_extra_options()
 
     # TODO Any other options to add?
 }
+
+function usage()
+{
+    cat <<EOF
+Usage: $0 [-d] [FILENAME]...
+
+Add copyright header to files according to the matched patterns in the '.reuse-hdrmap.json'
+
+Options:
+    -d      show REUSE command but don't execute it
+EOF
+}
 # END Helper functions
 
 declare hdrmap_file="$(git rev-parse --show-toplevel 2>/dev/null)"/.reuse-hdrmap.json
 declare dry_run
 
-while getopts 'c:d' option; do
+while getopts 'hc:d' option; do
     case ${option} in
     c)
         hdrmap_file="${OPTARG}"
         ;;
     d)
         dry_run='echo'
+        ;;
+    h)
+        usage
+        exit 0
         ;;
     *)
         exit 1
