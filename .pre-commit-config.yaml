@@ -47,6 +47,7 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
+        stages: [commit-msg, pre-commit]
 
   - repo: https://github.com/crate-ci/typos
     rev: v1.24.3
@@ -55,6 +56,7 @@ repos:
         # NOTE Override hook provided args to prevent automatic
         # fixing of found typos. Let the dev decide what to fix!
         args: [--force-exclude]
+        stages: [commit-msg, pre-commit]
 
   - repo: https://github.com/fsfe/reuse-tool
     rev: v4.0.3
