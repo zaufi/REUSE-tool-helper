@@ -4,7 +4,7 @@
 #
 
 default_stages: [pre-commit]
-default_install_hook_types: [pre-commit, commit-msg]
+default_install_hook_types: [commit-msg, pre-commit]
 fail_fast: false
 
 repos:
@@ -50,7 +50,7 @@ repos:
         stages: [commit-msg, pre-commit]
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.26.0
+    rev: v1.27.0
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
