@@ -200,7 +200,7 @@ if [[ ! -f ${hdrmap_file} ]]; then
 fi
 
 declare -a input_files=( "${@}" )
-if [[ ${#input_files} -eq 0 ]]; then
+if [[ ${#input_files[@]} -eq 0 ]]; then
     die 'Error: No input files given'
 fi
 
