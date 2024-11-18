@@ -136,7 +136,7 @@ function try_get_extra_options()
     if [[ -n ${style} ]]; then
         case $(cut -f 2 -d ' ' <<<"${style}") in
             # TODO Parse `reuse` help and get this list?
-            applescript | aspx | bat | bibtex | c |cpp | cppsingle | \
+            applescript | aspx | bat | bibtex | c | cpp | cppsingle | \
             f | ftl | handlebars | haskell | html | jinja | julia | \
             lisp | m4 | ml | f90 | plantuml | python | rst | \
             semicolon | tex | man | vst | vim | xquery)
