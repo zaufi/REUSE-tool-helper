@@ -20,6 +20,7 @@ repos:
       - id: check-executables-have-shebangs
         always_run: true
       - id: check-json
+      - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
@@ -50,7 +51,7 @@ repos:
         stages: [commit-msg, pre-commit]
 
   - repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.12.4
+    rev: v1.29.5
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
@@ -68,3 +69,8 @@ repos:
     hooks:
       - id: shellcheck
         args: ['--shell=bash', '--color=always']
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.44.0
+    hooks:
+      - id: markdownlint
