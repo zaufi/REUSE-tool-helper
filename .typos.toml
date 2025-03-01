@@ -1,9 +1,6 @@
 #
-# SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2024 - 2025 Alex Turbov <i.zaufi@gmail.com>
 # SPDX-License-Identifier: CC0-1.0
-#
-# NOTE The manual about all configuration options is here:
-# https://github.com/crate-ci/typos/blob/master/docs/reference.md
 #
 
 [default]
@@ -16,7 +13,7 @@ extend-ignore-re = [
   , "(?Rm)^.*(#|//)\\s*(NOQA|noqa):? spellcheck(: *|=| +)disable-line$"
     # Exclude Git hashes (a whole line with `index` in the `COMMIT_EDITMSG` file)
     # BUG https://github.com/crate-ci/typos/issues/1117
-  , "(?Rm)^index [0-9a-f]{9}\\.\\.[0-9a-f]{9} [0-9]+$"
+  , "(?Rm)^index [0-9a-f]{7}\\.\\.[0-9a-f]{7} [0-9]+$"
   ]
 locale = "en-us"
 
