@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2024-2025 Alex Turbov <i.zaufi@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -22,7 +22,7 @@ function warning()
 
 function try_match_file_and_get_object()
 {
-    local -r input_file="$1"
+    local -r input_file="$(realpath -m "$1")"
     local -r array_json="$2"
     local -ir count=$(jq '. | length' <<<"${array_json}")
 

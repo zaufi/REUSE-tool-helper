@@ -30,7 +30,7 @@ Options:
 
 Each object of the `templates` array has the following properties (keys):
 
-- `patterns` is an array of shell (possibly `extglob`) patterns to match input files.
+- `patterns` is an array of shell (possibly `extglob`) patterns to match input files. [^1]
 - `extra_reuse_cli_options` provides extra options to the [`reuse annotate` command line].
    See below.
 
@@ -44,7 +44,7 @@ final CLI for `reuse annotate`.
 
 Each object of the `licenses` array has the following properties (keys):
 
-- `patterns` is an array of shell (possibly `extglob`) patterns to match input files.
+- `patterns` is an array of shell (possibly `extglob`) patterns to match input files. [^1]
 - `ref` is an [SPDX license expression] that will be applied to the matched input file.
 
 [SPDX license expression]: https://spdx.github.io/spdx-spec/v3.0/annexes/SPDX-license-expressions/
@@ -54,8 +54,12 @@ Each object of the `licenses` array has the following properties (keys):
 
 Each object of the `copyright_headers` array has the following properties (keys):
 
-- `patterns` is an array of shell (possibly `extglob`) patterns to match input files.
+- `patterns` is an array of shell (possibly `extglob`) patterns to match input files. [^1]
 - `text` is a copyright text to apply for the matched input file.
+
+
+[^1]: The input file is always transformed into an absolute path. Therefore, if your pattern
+has directories (relative to a repository's root) start it with the `*/` at the beginning.
 
 
 ## Extra options
