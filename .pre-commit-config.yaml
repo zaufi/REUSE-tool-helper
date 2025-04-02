@@ -50,8 +50,9 @@ repos:
       - id: codespell
         stages: [commit-msg, pre-commit]
 
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.30.0
+    # NOTE See BUG https://github.com/crate-ci/typos/issues/390
+  - repo: https://github.com/adhtruong/mirrors-typos
+    rev: v1.31.1
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
