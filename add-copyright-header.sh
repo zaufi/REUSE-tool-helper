@@ -120,7 +120,7 @@ function try_get_extra_options()
     if [[ -n ${prefix} ]]; then
         case $(cut -f 2 -d ' ' <<<"${prefix}") in
             # TODO Parse `reuse` help and get this list?
-            spdx | spdx-c | spdx-symbol | string | string-c | string-symbol | symbol)
+            spdx | spdx-c | spdx-string-c | spdx-string | spdx-string-symbol | spdx-symbol | string | string-c | string-symbol | symbol)
                 # FIXME SC2206
                 # shellcheck disable=SC2206
                 output_opts+=( ${prefix} )
