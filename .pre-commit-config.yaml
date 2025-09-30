@@ -14,7 +14,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-case-conflict
       - id: check-executables-have-shebangs
@@ -40,7 +40,7 @@ repos:
         stages: [commit-msg]
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.2.0
+    rev: 3.4.0
     hooks:
       - id: editorconfig-checker
 
@@ -52,7 +52,7 @@ repos:
 
     # NOTE See BUG https://github.com/crate-ci/typos/issues/390
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.31.1
+    rev: v1.36.3
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
@@ -61,17 +61,17 @@ repos:
         stages: [commit-msg, pre-commit]
 
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v5.0.2
+    rev: v5.1.1
     hooks:
       - id: reuse
 
   - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.10.0
+    rev: v0.11.0
     hooks:
       - id: shellcheck
         args: ['--shell=bash', '--color=always']
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.44.0
+    rev: v0.45.0
     hooks:
       - id: markdownlint
