@@ -1,10 +1,16 @@
-#
 # SPDX-FileCopyrightText: 2024 - 2025 Alex Turbov <i.zaufi@gmail.com>
 # SPDX-License-Identifier: CC0-1.0
 #
+# Read the docs here: https://pre-commit.com
+#
+# Install hooks to your Git repo clone:
+#   $ pre-commit install
+#
+# List of available hooks: https://pre-commit.com/hooks.html
+#
 
 default_stages: [pre-commit]
-default_install_hook_types: [commit-msg, pre-commit]
+default_install_hook_types: &all [commit-msg, pre-commit]
 fail_fast: false
 
 repos:
@@ -32,6 +38,9 @@ repos:
       - id: git-check
         pass_filenames: false
 
+    # NOTE Read the configuration docs here: http://jorisroovers.github.io/gitlint
+    # NOTE Read the "Conventional Commits" Specification here:
+    # https://www.conventionalcommits.org/en/v1.0.0/#summary
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:
@@ -39,8 +48,9 @@ repos:
         name: Commit message check
         stages: [commit-msg]
 
-  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.4.0
+    # NOTE For config options check this: https://editorconfig-checker.github.io
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker
+    rev: v3.4.0
     hooks:
       - id: editorconfig-checker
 
@@ -48,7 +58,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        stages: [commit-msg, pre-commit]
+        stages: *all
 
     # NOTE See BUG https://github.com/crate-ci/typos/issues/390
   - repo: https://github.com/adhtruong/mirrors-typos
@@ -58,7 +68,7 @@ repos:
         # NOTE Override hook provided args to prevent automatic
         # fixing of found typos. Let the dev decide what to fix!
         args: [--force-exclude]
-        stages: [commit-msg, pre-commit]
+        stages: *all
 
   - repo: https://github.com/fsfe/reuse-tool
     rev: v5.1.1
