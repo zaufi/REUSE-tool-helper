@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: CC0-1.0
 
 repository: zaufi/bare-minimum-repo
-last-sync: 36360dc
+last-sync: 617ef75
 
 exclude:
-  - README\.md
   - LICENSES?
+  - README\.md
 
 commit-message: |
   chore(🤖): sync with upstream template repo ${repository}
