@@ -21,4 +21,5 @@ jobs:
       - name: Try retrieve changes
         uses: zaufi/sync-with-template-repo-action@master
         with:
+          make_pr: true
           token: ${{ github.token }}
