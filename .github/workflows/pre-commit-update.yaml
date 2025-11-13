@@ -11,9 +11,6 @@ on:
   # on demand
   workflow_dispatch:
 
-  # enable this workflow to be reused
-  workflow_call:
-
 env:
   CLICOLOR: 1
   CLICOLOR_FORCE: 1
