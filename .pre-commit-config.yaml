@@ -50,7 +50,7 @@ repos:
 
     # NOTE For config options check this: https://editorconfig-checker.github.io
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
-    rev: v3.4.0
+    rev: v3.4.1
     hooks:
       - id: editorconfig-checker
 
@@ -62,7 +62,7 @@ repos:
 
     # NOTE See BUG https://github.com/crate-ci/typos/issues/390
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.36.3
+    rev: v1.39.0
     hooks:
       - id: typos
         # NOTE Override hook provided args to prevent automatic
@@ -71,7 +71,7 @@ repos:
         stages: *all
 
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v5.1.1
+    rev: v6.2.0
     hooks:
       - id: reuse
 
