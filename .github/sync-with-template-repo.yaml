@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Alex Turbov <zaufi@pm.me>
+# SPDX-License-Identifier: CC0-1.0
+
+repository: zaufi/bare-minimum-repo
+last-sync: a24345b
+
+exclude:
+  - README\.md
+  - LICENSE
+  - \.github/workflows/pre-commit-check\.yaml
+
+commit-message: |
+  chore(🤖): sync with upstream template repo ${repository}
+
+  Receive changes in service files from the parent template repository
+  happened since the ${since} to the ${last} commits.
+
+  SKIP-BUILD
+
+pr-body: |
+  # Changes in this PR
+
+  Receive changes in service files from the parent template repository [happened since the last sync].
+
+  [happened since the last sync]: https://github.com/${repository}/compare/${since}...${last}
