@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 repository: zaufi/bare-minimum-repo
-last-sync: a24345b
+last-sync: 36360dc
 
 exclude:
   - README\.md
