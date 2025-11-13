@@ -11,13 +11,14 @@ on:
   workflow_call:
 
 jobs:
-  sync-with-template:
-    name: Sync with template repository
+  sync-with-template-repo:
+    name: Sync with template repo
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: zaufi/sync-with-template-repo-action@master
+      - name: Try retrieve changes
+        uses: zaufi/sync-with-template-repo-action@master
         with:
           token: ${{ github.token }}
