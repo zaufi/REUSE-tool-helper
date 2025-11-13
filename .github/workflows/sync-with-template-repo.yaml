@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Alex Turbov <zaufi@pm.me>
+# SPDX-License-Identifier: CC0-1.0
+
+name: Template Repo Sync
+
+on:
+  # allow manual runs
+  workflow_dispatch:
+
+  # enable this workflow to be reused
+  workflow_call:
+
+jobs:
+  sync-with-template:
+    name: Sync with template repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - uses: zaufi/sync-with-template-repo-action@master
+        with:
+          token: ${{ github.token }}
