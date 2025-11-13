@@ -6,8 +6,7 @@ last-sync: a24345b
 
 exclude:
   - README\.md
-  - LICENSE
-  - \.github/workflows/pre-commit-check\.yaml
+  - LICENSES?
 
 commit-message: |
   chore(🤖): sync with upstream template repo ${repository}
