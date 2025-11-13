@@ -1,5 +1,6 @@
-# SPDX-FileCopyrightText: 2023 Alex Turbov <zaufi@pm.me>
+# SPDX-FileCopyrightText: Alex Turbov <zaufi@pm.me>
 # SPDX-License-Identifier: CC0-1.0
+
 name: Pre-commit auto-update
 
 on:
@@ -12,6 +13,12 @@ on:
 
   # enable this workflow to be reused
   workflow_call:
+
+env:
+  CLICOLOR: 1
+  CLICOLOR_FORCE: 1
+  FORCE_COLOR: 1
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
 
 jobs:
   auto-update:
@@ -31,9 +38,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update/pre-commit-hooks
           delete-branch: true
-          title: 'ci: version bump `pre-commit` hook plugins'
-          commit-message: 'misc: version bump `pre-commit` hook plugins'
+          commit-message: 'ci(pre-commit): version bump hooks'
+          title: 'ci(pre-commit): version bump hooks'
           body: |
             # Changes in this PR
 
-            Update plugins of `pre-commit` hooks to the latest version.
+            Automatically update the `pre-commit` hook plugins to their latest versions.
