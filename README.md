@@ -9,9 +9,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
 The repo provides a helper script (`add-copyright-headers`) that simplifies adding or updating
 copyright headers in large projects migrating to the [reuse tool].
 
-The script is looking for the configuration file at the top directory of the current Git
-repository. The configuration file is a JSON file named `.reuse-hdrmap.json`. It consists of
-the following top-level keys, each of which is an array of objects: `templates`, `licenses`, and
+The script looks for the configuration file at the top directory of the current Git repository.
+The configuration file is a JSON file named `.reuse-hdrmap.json`. Outside of a Git repository,
+the script falls back to `${XDG_CONFIG_HOME:-$HOME/.config}/reuse-hdrmap.json`, and then to
+`/etc/reuse-hdrmap.json` if the user-level XDG config file does not exist. It consists of the
+following top-level keys, each of which is an array of objects: `templates`, `licenses`, and
 `copyright_headers`. Also, there could be a "global" `extra_reuse_cli_options` object.
 
 [reuse tool]: https://reuse.software/

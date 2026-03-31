@@ -185,9 +185,8 @@ EOF
 }
 # END Helper functions
 
-declare git_toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"
-declare hdrmap_file="${git_toplevel}"/.reuse-hdrmap.json
-declare dry_run
+declare hdrmap_file=
+declare dry_run=
 
 while getopts 'hc:d' option; do
     case ${option} in
@@ -208,8 +207,34 @@ while getopts 'hc:d' option; do
 done
 shift $((OPTIND - 1))
 
-if [[ ! -f ${hdrmap_file} ]]; then
-    die "Error: No hdrmap config file found: ${hdrmap_file}"
+if [[ -z ${hdrmap_file} ]]; then
+    declare git_toplevel=
+    declare xdg_config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+    declare -a hdrmap_candidates=()
+
+    if git_toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"; then
+        hdrmap_candidates+=("${git_toplevel}"/.reuse-hdrmap.json)
+    fi
+    hdrmap_candidates+=(
+        "${xdg_config_home}"/reuse-hdrmap.json
+        '/etc/reuse-hdrmap.json'
+    )
+
+    for candidate in "${hdrmap_candidates[@]}"; do
+        if [[ -f ${candidate} ]]; then
+            hdrmap_file="${candidate}"
+            break
+        fi
+    done
+
+fi
+
+if [[ -z ${hdrmap_file} ]]; then
+    die "Error: No config file found. Tried: ${hdrmap_candidates[*]}"
+fi
+
+if [[ ! -r ${hdrmap_file} ]]; then
+    die "Error: Given config file is not readable: ${hdrmap_file}"
 fi
 
 declare -a input_files=( "${@}" )
