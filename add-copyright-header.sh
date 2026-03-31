@@ -26,19 +26,20 @@ function try_match_file_and_get_object()
     local repo_relative_file=
     local -r array_json="$2"
     local -ir count=$(jq '. | length' <<<"${array_json}")
+    local -a patterns=()
+    local candidate_json
+    local pattern
 
     if [[ -n ${git_toplevel} ]]; then
         repo_relative_file="$(realpath -m --relative-to="${git_toplevel}" "${input_file}")"
     fi
 
     for ((i=0; i<=count-1; i++)) do
-        local candidate_json="$(jq ".[${i}]" <<<"${array_json}")"
-        # FIXME SC2207
-        # shellcheck disable=SC2207
-        local -a patterns=( $(jq .patterns[] <<<"${candidate_json}") )
+        candidate_json="$(jq ".[${i}]" <<<"${array_json}")"
+        mapfile -t patterns < <(jq -r '.patterns[]' <<<"${candidate_json}")
         for pattern in "${patterns[@]}"; do
             # shellcheck disable=SC2053
-            if [[ "\"${repo_relative_file}\"" == ${pattern} || "\"${input_file}\"" == ${pattern} ]]; then
+            if [[ ${repo_relative_file} == ${pattern} || ${input_file} == ${pattern} ]]; then
                 if [[ ${VERBOSE} -gt 0 ]]; then
                     echo "Match: ${repo_relative_file:-${input_file}} -> ${pattern}" >&2
                 fi
@@ -90,13 +91,7 @@ function get_extra_reuse_cli_option()
                 <<<"${json}"
             ;;
         str)
-            jq -r \
-                "if .extra_reuse_cli_options.${name} then \
-                    \"--${name//_/-} \" + .extra_reuse_cli_options.${name} \
-                else \
-                    \"\" \
-                end" \
-                <<<"${json}"
+            jq -r ".extra_reuse_cli_options.${name} // empty" <<<"${json}"
             ;;
         *)
             ;;
@@ -141,48 +136,39 @@ function try_get_extra_options()
 {
     local -r json="$1"
     local -n output_opts="$2"
+    local value
 
-    # FIXME SC2207
-    # shellcheck disable=SC2207
-    output_opts+=( $(get_extra_reuse_cli_option merge_copyrights bool "${json}") )
-    # FIXME SC2207
-    # shellcheck disable=SC2207
-    output_opts+=( $(get_extra_reuse_cli_option no_replace bool "${json}") )
-    # FIXME SC2207
-    # shellcheck disable=SC2207
-    output_opts+=( $(get_extra_reuse_cli_option force_dot_license bool "${json}") )
-    # FIXME SC2207
-    # shellcheck disable=SC2207
-    output_opts+=( $(get_extra_reuse_cli_option exclude_year bool "${json}") )
+    value="$(get_extra_reuse_cli_option merge_copyrights bool "${json}")"
+    [[ -n ${value} ]] && output_opts+=("${value}")
+    value="$(get_extra_reuse_cli_option no_replace bool "${json}")"
+    [[ -n ${value} ]] && output_opts+=("${value}")
+    value="$(get_extra_reuse_cli_option force_dot_license bool "${json}")"
+    [[ -n ${value} ]] && output_opts+=("${value}")
+    value="$(get_extra_reuse_cli_option exclude_year bool "${json}")"
+    [[ -n ${value} ]] && output_opts+=("${value}")
 
-    declare -r prefix="$(get_extra_reuse_cli_option copyright_prefix str "${json}")"
-    if [[ -n ${prefix} ]]; then
-        if option_value_allowed_in _ALLOWED_COPYRIGHT_PREFIXES "$(cut -f 2 -d ' ' <<<"${prefix}")"; then
-            # FIXME SC2206
-            # shellcheck disable=SC2206
-            output_opts+=( ${prefix} )
+    value="$(get_extra_reuse_cli_option copyright_prefix str "${json}")"
+    if [[ -n ${value} ]]; then
+        if option_value_allowed_in _ALLOWED_COPYRIGHT_PREFIXES "${value}"; then
+            output_opts+=('--copyright-prefix' "${value}")
         else
             die 'Error: Invalid value for copyright_prefix'
         fi
     fi
 
     # TODO Deduplicate this code. It's very similar to `copyright_prefix`!
-    declare -r style="$(get_extra_reuse_cli_option style str "${json}")"
-    if [[ -n ${style} ]]; then
-        if option_value_allowed_in _ALLOWED_STYLES "$(cut -f 2 -d ' ' <<<"${style}")"; then
-            # FIXME SC2206
-            # shellcheck disable=SC2206
-            output_opts+=( ${style} )
+    value="$(get_extra_reuse_cli_option style str "${json}")"
+    if [[ -n ${value} ]]; then
+        if option_value_allowed_in _ALLOWED_STYLES "${value}"; then
+            output_opts+=('--style' "${value}")
         else
             die 'Error: Invalid value for style'
         fi
     fi
 
-    declare -r template="$(get_extra_reuse_cli_option template str "${json}")"
-    if [[ -n ${template} ]]; then
-        # FIXME SC2206
-        # shellcheck disable=SC2206
-        output_opts+=( ${template} )
+    value="$(get_extra_reuse_cli_option template str "${json}")"
+    if [[ -n ${value} ]]; then
+        output_opts+=('--template' "${value}")
     fi
 
     # TODO Any other options to add?
