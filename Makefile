@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: CC0-1.0
 #
 
-PREFIX=/usr/local
-BINDIR=$(PREFIX)/bin
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
+
+.PHONY: all install
 
 all:
 	:
