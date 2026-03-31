@@ -103,6 +103,40 @@ function get_extra_reuse_cli_option()
     esac
 }
 
+function parse_reuse_annotate_allowed_values()
+{
+    local -r option_name="$1"
+    local option_line=
+    local option_values=
+    local value
+
+    option_line="$(grep -F -- "--${option_name} [" <<<"${reuse_annotate_help}")"
+    [[ -n ${option_line} ]] || die "Error: Failed to parse \`reuse annotate --help\` for --${option_name}"
+
+    if [[ ${option_line} =~ --${option_name}[[:space:]]\[([^]]+)\] ]]; then
+        option_values="${BASH_REMATCH[1]}"
+    else
+        die "Error: Failed to parse \`reuse annotate --help\` for --${option_name}"
+    fi
+
+    for value in ${option_values//|/ }; do
+        [[ -n ${value} ]] && printf '%s\n' "${value}"
+    done
+}
+
+function option_value_allowed_in()
+{
+    local -n allowed_values="$1"
+    local -r value="$2"
+    local allowed_value
+
+    for allowed_value in "${allowed_values[@]}"; do
+        [[ ${allowed_value} == "${value}" ]] && return 0
+    done
+
+    return 1
+}
+
 function try_get_extra_options()
 {
     local -r json="$1"
@@ -123,36 +157,25 @@ function try_get_extra_options()
 
     declare -r prefix="$(get_extra_reuse_cli_option copyright_prefix str "${json}")"
     if [[ -n ${prefix} ]]; then
-        case $(cut -f 2 -d ' ' <<<"${prefix}") in
-            # TODO Parse `reuse` help and get this list?
-            spdx | spdx-c | spdx-string-c | spdx-string | spdx-string-symbol | spdx-symbol | string | string-c | string-symbol | symbol)
-                # FIXME SC2206
-                # shellcheck disable=SC2206
-                output_opts+=( ${prefix} )
-                ;;
-            *)
-                die 'Error: Invalid value for copyright_prefix'
-                ;;
-        esac
+        if option_value_allowed_in _ALLOWED_COPYRIGHT_PREFIXES "$(cut -f 2 -d ' ' <<<"${prefix}")"; then
+            # FIXME SC2206
+            # shellcheck disable=SC2206
+            output_opts+=( ${prefix} )
+        else
+            die 'Error: Invalid value for copyright_prefix'
+        fi
     fi
 
     # TODO Deduplicate this code. It's very similar to `copyright_prefix`!
     declare -r style="$(get_extra_reuse_cli_option style str "${json}")"
     if [[ -n ${style} ]]; then
-        case $(cut -f 2 -d ' ' <<<"${style}") in
-            # TODO Parse `reuse` help and get this list?
-            applescript | aspx | bat | bibtex | c | cpp | cppsingle | \
-            f | ftl | handlebars | haskell | html | jinja | julia | \
-            lisp | m4 | ml | f90 | plantuml | python | rst | \
-            semicolon | tex | man | vst | vim | xquery)
-                # FIXME SC2206
-                # shellcheck disable=SC2206
-                output_opts+=( ${style} )
-                ;;
-            *)
-                die 'Error: Invalid value for style'
-                ;;
-        esac
+        if option_value_allowed_in _ALLOWED_STYLES "$(cut -f 2 -d ' ' <<<"${style}")"; then
+            # FIXME SC2206
+            # shellcheck disable=SC2206
+            output_opts+=( ${style} )
+        else
+            die 'Error: Invalid value for style'
+        fi
     fi
 
     declare -r template="$(get_extra_reuse_cli_option template str "${json}")"
@@ -216,8 +239,16 @@ if ! jq empty <<<"${hdrmap_json}" 2>/dev/null; then
     die "Error: Input file isn't a valid JSON: ${hdrmap_file}"
 fi
 
-declare git_reuse_name="$(get_any_of_git_options reuse.name user.name)"
-declare git_reuse_email="$(get_any_of_git_options reuse.email user.email)"
+declare -r git_reuse_name="$(get_any_of_git_options reuse.name user.name)"
+declare -r git_reuse_email="$(get_any_of_git_options reuse.email user.email)"
+
+declare -r reuse_annotate_help="$(reuse annotate --help)"
+declare -a _ALLOWED_STYLES=()
+mapfile -t _ALLOWED_STYLES < <(parse_reuse_annotate_allowed_values style)
+readonly -a _ALLOWED_STYLES
+declare -a _ALLOWED_COPYRIGHT_PREFIXES=()
+mapfile -t _ALLOWED_COPYRIGHT_PREFIXES < <(parse_reuse_annotate_allowed_values copyright-prefix)
+readonly -a _ALLOWED_COPYRIGHT_PREFIXES
 
 for input_file in "${input_files[@]}"; do
     # Collect the final `reuse` CLI options here
