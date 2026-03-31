@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# SPDX-FileCopyrightText: 2024-2025 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2024-2026 Alex Turbov <i.zaufi@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
@@ -23,8 +23,13 @@ function warning()
 function try_match_file_and_get_object()
 {
     local -r input_file="$(realpath -m "$1")"
+    local repo_relative_file=
     local -r array_json="$2"
     local -ir count=$(jq '. | length' <<<"${array_json}")
+
+    if [[ -n ${git_toplevel} ]]; then
+        repo_relative_file="$(realpath -m --relative-to="${git_toplevel}" "${input_file}")"
+    fi
 
     for ((i=0; i<=count-1; i++)) do
         local candidate_json="$(jq ".[${i}]" <<<"${array_json}")"
@@ -33,9 +38,9 @@ function try_match_file_and_get_object()
         local -a patterns=( $(jq .patterns[] <<<"${candidate_json}") )
         for pattern in "${patterns[@]}"; do
             # shellcheck disable=SC2053
-            if [[ "\"${input_file}\"" == ${pattern} ]]; then
+            if [[ "\"${repo_relative_file}\"" == ${pattern} || "\"${input_file}\"" == ${pattern} ]]; then
                 if [[ ${VERBOSE} -gt 0 ]]; then
-                    echo "Match: ${input_file} -> ${pattern}" >&2
+                    echo "Match: ${repo_relative_file:-${input_file}} -> ${pattern}" >&2
                 fi
                 jq -r 'del(.patterns)' <<<"${candidate_json}"
                 return
@@ -173,7 +178,8 @@ EOF
 }
 # END Helper functions
 
-declare hdrmap_file="$(git rev-parse --show-toplevel 2>/dev/null)"/.reuse-hdrmap.json
+declare git_toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"
+declare hdrmap_file="${git_toplevel}"/.reuse-hdrmap.json
 declare dry_run
 
 while getopts 'hc:d' option; do

@@ -1,5 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
+SPDX-FileCopyrightText: 2024-2026 Alex Turbov <i.zaufi@gmail.com>
+
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
 
@@ -58,8 +59,8 @@ Each object of the `copyright_headers` array has the following properties (keys)
 - `text` is a copyright text to apply for the matched input file.
 
 
-[^1]: The input file is always transformed into an absolute path. Therefore, if your pattern
-has directories (relative to a repository's root) start it with the `*/` at the beginning.
+[^1]: Patterns are matched against the path relative to the repository root. Absolute-path
+      patterns also work, but repository-relative paths are the intended form.
 
 
 ## Extra options
