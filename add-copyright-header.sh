@@ -66,12 +66,10 @@ function subst_git_config_options()
 {
     local -r name="$1"
     local -r value="$2"
-    local -r text="$3"
-    if [[ ${text} =~ (.*)%${name}%(.*) ]]; then
-        echo "${BASH_REMATCH[1]}${value}${BASH_REMATCH[2]}"
-    else
-        echo "${text}"
-    fi
+    local text="$3"
+
+    text="${text//%${name}%/${value}}"
+    echo "${text}"
 }
 
 function get_extra_reuse_cli_option()
