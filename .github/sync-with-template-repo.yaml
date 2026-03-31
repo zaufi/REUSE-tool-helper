@@ -19,6 +19,7 @@ commit-message: |
 pr-body: |
   # Changes in this PR
 
-  Receive changes in service files from the parent template repository [happened since the last sync].
+  Receive changes in service files from the parent template repository
+  [happened since the last sync].
 
   [happened since the last sync]: https://github.com/${repository}/compare/${since}...${last}

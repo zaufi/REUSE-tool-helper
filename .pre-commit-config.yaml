@@ -27,7 +27,6 @@ repos:
         always_run: true
       - id: check-json
       - id: check-toml
-      - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
@@ -38,16 +37,16 @@ repos:
       - id: git-check
         pass_filenames: false
 
-    # NOTE Read the configuration docs here: http://jorisroovers.github.io/gitlint
-    # NOTE Read the "Conventional Commits" Specification here:
-    # https://www.conventionalcommits.org/en/v1.0.0/#summary
+  # NOTE Read the configuration docs here: http://jorisroovers.github.io/gitlint
+  # NOTE Read the "Conventional Commits" Specification here:
+  # https://www.conventionalcommits.org/en/v1.0.0/#summary
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:
       - id: gitlint
         stages: [commit-msg]
 
-    # NOTE For config options check this: https://editorconfig-checker.github.io
+  # NOTE For config options check this: https://editorconfig-checker.github.io
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
     rev: v3.6.1
     hooks:
@@ -59,7 +58,7 @@ repos:
       - id: codespell
         stages: *all
 
-    # NOTE See BUG https://github.com/crate-ci/typos/issues/390
+  # NOTE See BUG https://github.com/crate-ci/typos/issues/390
   - repo: https://github.com/adhtruong/mirrors-typos
     rev: v1.44.0
     hooks:
@@ -71,6 +70,11 @@ repos:
     hooks:
       - id: markdownlint
 
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+
   - repo: https://github.com/fsfe/reuse-tool
     rev: v6.2.0
     hooks:
@@ -80,4 +84,4 @@ repos:
     rev: v0.11.0
     hooks:
       - id: shellcheck
-        args: ['--shell=bash', '--color=always']
+        args: [--shell=bash, --color=always]

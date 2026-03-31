@@ -19,6 +19,10 @@ MD013:
 MD024:
   siblings_only: true
 
+# Proper names should have the correct capitalization
+MD044:
+  code_blocks: false
+
 # Code fence style
 MD048:
   style: backtick
