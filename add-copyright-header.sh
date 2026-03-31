@@ -20,6 +20,14 @@ function warning()
     echo "$@" >&2
 }
 
+function ensure_command_available()
+{
+    local -r command_name="$1"
+
+    command -v "${command_name}" >/dev/null 2>&1 \
+      || die "Error: Required command not found: ${command_name}"
+}
+
 function try_match_file_and_get_object()
 {
     local -r input_file="$(realpath -m "$1")"
@@ -177,7 +185,7 @@ function usage()
     cat <<EOF
 Usage: $0 [-c FILE] [-d] [FILENAME]...
 
-Add copyright header to files according to the matched patterns in the '.reuse-hdrmap.json'
+Add copyright header to files according to the matched patterns in the config file
 
 Options:
     -c FILE use the given hdrmap config file
@@ -208,16 +216,23 @@ while getopts 'hc:d' option; do
 done
 shift $((OPTIND - 1))
 
+ensure_command_available jq
+
 if [[ -z ${hdrmap_file} ]]; then
     declare git_toplevel=
     declare xdg_config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
     declare -a hdrmap_candidates=()
 
     if git_toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"; then
-        hdrmap_candidates+=("${git_toplevel}"/.reuse-hdrmap.json)
+        hdrmap_candidates+=(
+            "${git_toplevel}"/.reuse-hdrmap.yaml
+            "${git_toplevel}"/.reuse-hdrmap.json
+        )
     fi
     hdrmap_candidates+=(
+        "${xdg_config_home}"/reuse-hdrmap.yaml
         "${xdg_config_home}"/reuse-hdrmap.json
+        '/etc/reuse-hdrmap.yaml'
         '/etc/reuse-hdrmap.json'
     )
 
@@ -243,11 +258,28 @@ if [[ ${#input_files[@]} -eq 0 ]]; then
     die 'Error: No input files given'
 fi
 
-declare -r hdrmap_json="$(<"${hdrmap_file}")"
-# NOTE Validate JSON
-if ! jq empty <<<"${hdrmap_json}" 2>/dev/null; then
-    die "Error: Input file isn't a valid JSON: ${hdrmap_file}"
-fi
+declare hdrmap_data_json=
+case "${hdrmap_file}" in
+*.json)
+    hdrmap_data_json="$(<"${hdrmap_file}")"
+    if ! jq empty <<<"${hdrmap_data_json}" 2>/dev/null; then
+        die "Error: Input file isn't a valid JSON: ${hdrmap_file}"
+    fi
+    ;;
+*.yaml)
+    ensure_command_available yq
+    if ! hdrmap_data_json="$(yq -o=json '.' "${hdrmap_file}" 2>/dev/null)"; then
+        die "Error: Input file isn't a valid YAML: ${hdrmap_file}"
+    fi
+    if ! jq empty <<<"${hdrmap_data_json}" 2>/dev/null; then
+        die "Error: Failed to convert YAML config to JSON: ${hdrmap_file}"
+    fi
+    ;;
+*)
+    die "Error: Unsupported config file extension: ${hdrmap_file}"
+    ;;
+esac
+readonly hdrmap_data_json
 
 declare -r git_reuse_name="$(get_any_of_git_options reuse.name user.name)"
 declare -r git_reuse_email="$(get_any_of_git_options reuse.email user.email)"
@@ -265,7 +297,7 @@ for input_file in "${input_files[@]}"; do
     declare -a extra_opts=()
 
     declare template_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .templates <<<"${hdrmap_json}")"
+        try_match_file_and_get_object "${input_file}" "$(jq .templates <<<"${hdrmap_data_json}")"
       )"
     try_get_extra_options "${template_json}" extra_opts
     # Make sure template or style has been given in the `extra_reuse_cli_options`
@@ -275,7 +307,7 @@ for input_file in "${input_files[@]}"; do
     fi
 
     declare license_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .licenses <<<"${hdrmap_json}")"
+        try_match_file_and_get_object "${input_file}" "$(jq .licenses <<<"${hdrmap_data_json}")"
       )"
     declare license="$(jq -r '.ref // empty' <<<"${license_json}")"
     if [[ -n ${license} ]]; then
@@ -286,7 +318,7 @@ for input_file in "${input_files[@]}"; do
     fi
 
     declare copyright_json="$(
-        try_match_file_and_get_object "${input_file}" "$(jq .copyright_headers <<<"${hdrmap_json}")"
+        try_match_file_and_get_object "${input_file}" "$(jq .copyright_headers <<<"${hdrmap_data_json}")"
       )"
     declare copyright="$(jq -r '.text // empty' <<<"${copyright_json}")"
     if [[ -z ${copyright} ]]; then
@@ -297,7 +329,7 @@ for input_file in "${input_files[@]}"; do
     copyright="$(subst_git_config_options reuse.email "${git_reuse_email}" "${copyright}")"
     extra_opts+=('--copyright' "${copyright}")
 
-    try_get_extra_options "${hdrmap_json}" extra_opts
+    try_get_extra_options "${hdrmap_data_json}" extra_opts
 
     ${dry_run} reuse annotate "${extra_opts[@]}" "${input_file}"
 done

@@ -10,12 +10,19 @@ The repo provides a helper script (`add-copyright-header`) that simplifies addin
 copyright headers in large projects migrating to the [reuse tool].
 
 The script looks for the configuration file at the top directory of the current Git repository.
-The configuration file is a JSON file named `.reuse-hdrmap.json`. Outside of a Git repository,
-the script falls back to `${XDG_CONFIG_HOME:-$HOME/.config}/reuse-hdrmap.json`, and then to
-`/etc/reuse-hdrmap.json` if the user-level XDG config file does not exist. Use `-c FILE` to
-override that lookup chain explicitly. The config consists of the following top-level keys, each
-of which is an array of objects: `templates`, `licenses`, and `copyright_headers`. Also, there
-could be a "global" `extra_reuse_cli_options` object.
+The configuration file can be JSON or YAML. For each lookup location, the script prefers YAML
+(`.yaml`) over JSON:
+
+- Git repository root: `.reuse-hdrmap.yaml`, `.reuse-hdrmap.json`
+- `${XDG_CONFIG_HOME:-$HOME/.config}`: `reuse-hdrmap.yaml`, `reuse-hdrmap.json`
+- `/etc`: `reuse-hdrmap.yaml`, `reuse-hdrmap.json`
+
+Use `-c FILE` to override that lookup chain explicitly. JSON and YAML share the same schema. The
+config consists of the following top-level keys, each of which is an array of objects:
+`templates`, `licenses`, and `copyright_headers`. Also, there could be a "global"
+`extra_reuse_cli_options` object.
+
+The script always requires `jq`. YAML configs additionally require `yq`.
 
 [reuse tool]: https://reuse.software/
 
@@ -23,7 +30,7 @@ could be a "global" `extra_reuse_cli_options` object.
 $ add-copyright-header -h
 Usage: add-copyright-header [-c FILE] [-d] [FILENAME]...
 
-Add copyright header to files according to the matched patterns in the '.reuse-hdrmap.json'
+Add copyright header to files according to the matched patterns in the config file
 
 Options:
     -c FILE use the given hdrmap config file
@@ -91,4 +98,25 @@ Additionally, a "global" (top-level) extra options object can be given, and opti
 added unconditionally to the effective CLI. Therefore, not all options make sense in this
 context. For example, `style` or `template` most likely do not make sense in the global context.
 
-See the example configuration file in this repository.
+## YAML example
+
+```yaml
+templates:
+  - patterns:
+      - "*.sh"
+    extra_reuse_cli_options:
+      style: shell
+
+licenses:
+  - patterns:
+      - "*.sh"
+    ref: GPL-3.0-or-later
+
+copyright_headers:
+  - patterns:
+      - "*.sh"
+    text: "%reuse.name% <%reuse.email%>"
+
+extra_reuse_cli_options:
+  merge_copyrights: true
+```
