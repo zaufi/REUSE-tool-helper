@@ -1,6 +1,5 @@
 <!--
 SPDX-FileCopyrightText: 2026 Alex Turbov <i.zaufi@gmail.com>
-
 SPDX-License-Identifier: CC0-1.0
 -->
 

@@ -1,7 +1,5 @@
-#
 # SPDX-FileCopyrightText: 2024 Alex Turbov <i.zaufi@gmail.com>
 # SPDX-License-Identifier: CC0-1.0
-#
 
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
