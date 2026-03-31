@@ -175,11 +175,12 @@ function try_get_extra_options()
 function usage()
 {
     cat <<EOF
-Usage: $0 [-d] [FILENAME]...
+Usage: $0 [-c FILE] [-d] [FILENAME]...
 
 Add copyright header to files according to the matched patterns in the '.reuse-hdrmap.json'
 
 Options:
+    -c FILE use the given hdrmap config file
     -d      show REUSE command but don't execute it
 EOF
 }
